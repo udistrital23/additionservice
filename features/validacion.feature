@@ -1,9 +1,8 @@
 # language: es
-Característica: Suma de números en diferentes bases
+Característica: Suma de números en base 10
 
   Escenario: Suma válida
-    Dado el número A "101" en base 2
-    Y el número B "12" en base 3
-    Y la base de salida es 4
+    Dado el número A "101"
+    Y el número B "12"
     Cuando se realiza la suma
-    Entonces el resultado es "33" en base 4
+    Entonces el resultado es "113"
