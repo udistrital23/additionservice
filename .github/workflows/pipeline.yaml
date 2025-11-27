@@ -1,0 +1,47 @@
+name: CI - Pruebas Nativas (Pytest + Behave)
+
+# Se ejecuta al hacer push o pull request en la rama main
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Descargar el código
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      # 2. Configurar Python (Usamos 3.11 como en tu Dockerfile)
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          # Habilita caché de pip para que las siguientes ejecuciones sean más rápidas
+          cache: 'pip' 
+
+      # 3. Instalar dependencias
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 4. Ejecutar Pruebas Unitarias (Pytest)
+      # Agregamos PYTHONPATH=. para asegurar que encuentre el modulo 'app'
+      - name: Correr Pytest
+        env:
+          PYTHONPATH: .
+        run: |
+          # El flag "|| true" es opcional: quítalo si quieres que falle si no hay tests unitarios
+          pytest -v 
+
+      # 5. Ejecutar Pruebas BDD (Behave)
+      # Si Pytest falla arriba, este paso NO se ejecutará
+      - name: Correr Behave
+        env:
+          PYTHONPATH: .
+        run: behave
