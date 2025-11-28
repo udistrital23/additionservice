@@ -1,26 +1,34 @@
 from behave import given, when, then
-from fastapi.testclient import TestClient
 
-@given('el número A "{numero_a:d}"')
-def step_set_number_a(context, numero_a):
+
+@given('los numeros enteros {numero_a:d} y {numero_b:d}')
+def step_set_numbers(context, numero_a, numero_b):
     context.numero_a = numero_a
-
-@given('el número B "{numero_b:d}"')
-def step_set_number_b(context, numero_b):
     context.numero_b = numero_b
 
-@when('se realiza la suma')
-def step_perform_addition(context):
-    context.payload = {
-        "numero_a": context.numero_a,
-        "numero_b": context.numero_b
-    }
-    context.response = context.client.post("/suma", json=context.payload)
 
-@then('el resultado es "{resultado_esperado:d}"')
+@when('realizo la suma')
+def step_perform_addition(context):
+    payload = {"numero_a": context.numero_a, "numero_b": context.numero_b}
+    context.response = context.client.post("/suma", json=payload)
+
+
+@when('intento realizar la suma')
+def step_attempt_addition(context):
+    payload = {"numero_a": context.numero_a, "numero_b": context.numero_b}
+    context.response = context.client.post("/suma", json=payload)
+
+
+@then('el resultado debe ser {resultado_esperado:d}')
 def step_check_result(context, resultado_esperado):
     assert context.response.status_code == 200, f"Error: {context.response.text}"
     data = context.response.json()
+    assert data.get("resultado") == resultado_esperado, f"Esperaba {resultado_esperado}, obtuve {data.get('resultado')}"
 
 
-    assert data["resultado"] == resultado_esperado, f"Esperaba {resultado_esperado}, obtuve {data['resultado']}"
+@then('se lanza una excepcion de "{mensaje}"')
+def step_check_exception_message(context, mensaje):
+    # FastAPI devuelve 400 con {'detail': '...'} cuando se lanza HTTPException
+    assert context.response.status_code == 400, f"Se esperaba 400, obtuvo {context.response.status_code}"
+    data = context.response.json()
+    assert data.get("detail") == mensaje, f"Esperaba mensaje '{mensaje}', obtuvo '{data.get('detail')}'"
