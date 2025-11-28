@@ -6,16 +6,11 @@ from app.validator import suma_bases
 
 
 class SumaRequest(BaseModel):
-    numero_a: str
-    base_a: int
-    numero_b: str
-    base_b: int
-    base_salida: int
-
+    numero_a: int
+    numero_b: int
 
 class SumaResponse(BaseModel):
-    resultado: str
-    base: int
+    resultado: int
 
 
 app = FastAPI(title="Base Converter Service")
